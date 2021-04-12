@@ -1,0 +1,48 @@
+version: '3.0'
+
+services:
+  client:
+    container_name: client
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    volumes:
+      - './client:/app'
+      - '/app/node_modules'
+    ports:
+      - 4200:80
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+  server:
+    container_name: server
+    build:
+        context: ./server
+        dockerfile: Dockerfile
+    volumes:
+        - './server:/app'
+        - '/app/node_modules'
+    ports:
+        - 3000:3000
+    environment:
+        - CHOKIDAR_USEPOLLING=true    
+    depends_on:
+        - db
+    env_file:
+      - ./server/.env
+    # environment:
+    #     - MYSQL_HOSTNAME=$MYSQL_HOSTNAME
+    #     - MYSQL_PORT=$MYSQL_PORT
+    #     - MYSQL_DB=$MYSQL_DB
+    #     - MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
+  db:
+    image: mysql
+    container_name: mysql
+    # ports:
+    #   - "3307:3306"
+    # env_file:
+    #   - ./server/.env
+    environment:
+        - MYSQL_ROOT_PASSWORD=123456
+    volumes:
+      - ./db/mysql:/data/db
+
